@@ -1,0 +1,46 @@
+{% extends 'network/layout.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block body %}
+
+  <div class="container">
+
+    <div>
+      <div class="border border-dark rounded text-center m-1 p-1 logform">
+        <div class="text-center my-2">
+          <h2>Edit Profile: {{ request.user.username }}</h2>
+        </div>
+        <hr>
+        <!-- Make a note: that enctype is necessary for uploading images -->
+        <form method="POST" action="{% url 'editprofile' %}">
+          {% csrf_token %}
+          <label for="first_name" class="m1"><b>{{ form.first_name.label }}</b></label>
+          <div class="m-1">
+            {{ form.first_name }}
+          </div>
+          <label for="last_name" class="m-1"><b>{{ form.last_name.label }}</b></label>
+          <div class="m-1">
+            {{ form.last_name }}
+          </div>
+          <label for="email" class="m-1"><b>{{ form.email.label }}</b></label>
+          <div class="m-1">
+            {{ form.email }}
+          </div>
+          <label for="biography" class="m-1"><b>{{ form.biography.label }}</b></label>
+          <div class="m-1">
+            {{ form.biography }}
+          </div>
+          <div class="d-flex justify-content-center py-2 px-1">
+            <input type="submit" name="logbtn" value="Edit save" class="btn">
+          </div>
+        </form>
+
+      </div>
+      <div class="text-center">
+        Don't want to edit profile? <a href="{% url 'viewprofile' request.user.id %}">Go back.</a>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

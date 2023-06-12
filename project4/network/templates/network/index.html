@@ -1,0 +1,156 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block title %}Network{% endblock %}
+
+{% block head %}
+<script src="{% static 'network/jscript.js' %}"></script>
+{% endblock %}
+
+
+{% block body %}
+
+<div class="container">
+
+  <div id="make-post-div">
+    {% if user.is_authenticated %}
+      <div class="border border-dark rounded cblue text-center m-1 p-1">
+        <div class="text-center pt-2">
+          <h2>What are you thinking?</h2>
+        </div>
+        <div>
+          <input type="button" id="make-post" value="Say something!" class="btn" name="postbtn">
+        </div>
+      </div>
+    {% else %}
+      <div class="border border-dark rounded cblue text-center m-1 p-1">
+        <div class="text-center pt-2">
+          <h2>PhiQuips</h2>
+          <h6>Philosophical Quips</h6>
+          <h6><a href="{% url 'login' %}">Log in</a> to opine!</h6>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div id="make-post-form" hidden>
+    {% if user.is_authenticated %}
+      <div class="border border-dark rounded cblue m-1 p-1">
+        <div class="text-center pt-2">
+          <h2>What are you thinking?</h2>
+        </div>
+        <hr>
+        <form method="POST" action="{% url 'index' %}">
+          {% csrf_token %}
+          <label for="subject" class="m-1"><b>{{ form.subject.label }}</b></label><br>
+          <div class="m-1">
+          {{ form.subject }}
+          </div>
+          <br>
+          <label for="content" class="m-1"><b>{{ form.content.label }}</b></label><br>
+          <div class="mx-1 p-1">
+          {{ form.content }}
+          </div>
+          <div class="d-flex flex-wrap justify-content-center">
+            <input type="submit" value="Post it!" name="postcmt" class="btn m-1">
+            <input type="button" id="cancel" value="Never mind!" name="postcmt" class="btn m-1">
+          </div>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+
+
+  <div>
+    {% for post in posts %}
+    <div class="border border-dark rounded m-1 p-1 ablue" id="post{{ post.id }}">
+      <div class="d-flex align-items-center">
+
+
+        {% for profile in profiles %}
+          {% if profile.member == post.author %}
+            {% if profile.userimage %}
+              <img src="{{ profile.userimage.url }}" class="border border-dark rounded" style="width: 45px; height: 45px; margin-right: 5px;">
+            {% else %}
+              <img src="{% static 'network/anon.png' %}" class="border border-dark rounded" style="width: 45px; height: 45px; margin-right: 5px;">
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+          <a name="username" href="{% url 'viewprofile' post.author.id %}">
+            <span class="username">{{ post.author.username }}</span>
+          </a>
+        {% else %}
+          <span class="username">{{ post.author.username }}</span>
+        {% endif %}
+      </div>
+      <h4>{{ post.subject }}</h4>
+
+      <textarea class="ta-posts" id="text{{ post.id }}" disabled>{{ post.content }}</textarea>
+      <div class="d-flex justify-content-between">
+        {% if user.is_authenticated %}
+          <div class="d-flex justify-content-start align-items-center">
+            <div>
+              <button onclick="put_like('{{ post.id }}', '{{ csrf_token }}')"><img src="{% static 'network/thumb.png' %}" style="width: 30px; height: 30px;"></button>
+            </div>
+            <div id="like-count{{ post.id }}" class="mx-2">
+              {{ post.liked.count }}
+            </div>
+          </div>
+        {% endif %}
+        {% if user == post.author %}
+          <input type="button" id="edit-btn{{ post.id }}" onclick="do_edit('{{ post.id }}')" class="lsblue" value="Edit">
+          <input hidden type="button" id="save-btn{{ post.id }}" onclick="put_edit('{{ post.id }}', '{{ user.id }}', '{{ csrf_token }}')" class="lorange" value="Save edit">
+        {% endif %}
+      </div>
+
+
+      {% if user.is_authenticated %}
+        <hr>
+        <div>
+          <h6>Posted: {{ post.date_created|date:"M d, Y, H:i" }}</h6>
+        </div>
+
+        <div id="edited{{ post.id }}">
+          {% if post.date_created|date:"dmYGi" != post.last_edit|date:"dmYGi" %}
+            <h6><i>Edited: {{ post.last_edit|date:"M d, Y, H:i" }}</i></h6>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+    {% empty %}
+      <div class="border border-dark rounded alone text-center m-1 p-1">
+        <div class="text-center pt-2">
+          <h2 class="text-light">No Posts</h2>
+          <div>
+            <img src="{% static 'network/posts.png' %}" style="width: 200px; height: 239px;">
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <hr>
+
+  <div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if posts.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">&laquo; Previous</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link" href="#">Beginning</a></li>
+        {% endif %}
+        <li class="page-item disabled"><a class="page-link" href="#">Page: {{ posts.number }} of {{ posts.paginator.num_pages }}</a></li>
+        {% if posts.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">Next &raquo;</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link" href="#">End</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+
+</div>
+
+{% endblock %}

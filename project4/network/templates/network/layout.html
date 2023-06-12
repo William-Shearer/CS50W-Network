@@ -1,0 +1,121 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link href="{% static 'network/styles.css' %}" rel="stylesheet">
+        <link rel="icon" type="image/xicon" href="{% static 'network/favicon.png' %}">
+        <!-- <script src="{% static 'network/jscript.js' %}"></script> -->
+
+        <script type="text/javascript">
+          // The modal pop up informational.
+          /*
+          Hah!
+          Funny old thing. Doing the modal with plain JavaScript and CSS is actually
+          easier than getting the Bootstrap5 builtin modal working properly, which
+          sort of, kind of, defeats the purpose of Bootstrap for that, doesn't it?
+          Remember that one for the furture... save some time. Look here if you forget.
+          Simple pimple...
+          */
+          function open_modal()
+          {
+            const modal = document.querySelector(".modal");
+            modal.classList.remove("hide");
+            document.querySelector(".btn-close").addEventListener("click",
+              function()
+              {
+                const modal = document.querySelector(".modal");
+                modal.classList.add("hide");
+              }
+            );
+          };
+
+          // If the modal is open and the user scrolls, close the modal.
+          window.addEventListener("scroll",
+            function ()
+            {
+              const modal = document.querySelector(".modal");
+              if (!(modal.classList.contains("hide")))
+              {
+                modal.classList.add("hide");
+              }
+            }
+          );
+
+        </script>
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body>
+
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top">
+
+            <a class="navbar-brand mx-1" href="#" onclick="open_modal()">PhiQuips</a>
+
+            <div>
+              <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'viewprofile' user.id %}"><strong>{{ user.username }}</strong></a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                  <a class="nav-link mx-1" href="{% url 'index' %}">All Posts</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'userfollowsposts' %}">Following</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'logout' %}">Log Out</a>
+                    </li>
+
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'login' %}">Log In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+              </ul>
+            </div>
+          </nav>
+
+
+          <section class="modal hide">
+            <div class="flex">
+              <h3>PhiQuips</h3>
+              <button class="btn-close"></button>
+            </div>
+            <div>
+              <h5>Privacy Policy</h5>
+              <p>
+                We will not share your data with any third party. Period.
+              </p>
+              <h5>Terms</h5>
+              <p>
+                PhiQuips is a place to jot down and share your random philosophical thoughts of the day.
+              </p>
+              <p>
+                If you quote someone else's philosophical observation, please consider citing the original author.
+              </p>
+              <p>
+                Please do not use obscene language, target other members or start discussions about sensitive subjects,
+                including religious, political, ethnic, or sports fan following.
+              </p>
+            </div>
+          </section>
+
+
+        {% block body %}
+        {% endblock %}
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    </body>
+</html>

@@ -1,0 +1,104 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block title %}Follows{% endblock %}
+
+{% block head %}
+  <script src="{% static 'network/jscript.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+
+  <div id="follow-heading">
+    <div class="border border-dark rounded fpink text-center m-1 p-1">
+      <div class="text-center pt-2">
+        <h3>Who you follow</h3>
+      </div>
+    </div>
+  </div>
+
+  {% if posts %}
+    {% for post in posts %}
+      <div class="border border-dark rounded m-1 p-1 frose" id="post{{ post.id }}">
+        <div class="d-flex align-items-center">
+
+          {% for profile in profiles %}
+            {% if profile.member == post.author %}
+            {% if profile.userimage %}
+              <img class="border border-dark rounded" src="{{ profile.userimage.url }}" style="width: 45px; height: 45px; margin-right: 5px;">
+            {% else %}
+              <img class="border border-dark rounded" src="{% static 'network/anon.png' %}" style="width: 45px; height: 45px; margin-right: 5px;">
+            {% endif %}
+            {% endif %}
+          {% endfor %}
+
+          <a name="username" href="{% url 'viewprofile' post.author.id %}">
+            <span class="username">{{ post.author.username }}</span>
+          </a>
+        </div>
+        <h4>{{ post.subject }}</h4>
+        <textarea class="ta-posts" id="text{{ post.id }}" disabled>{{ post.content }}</textarea>
+        <div class="d-flex justify-content-between">
+
+          <div class="d-flex justify-content-start align-items-center">
+            <div>
+              <button onclick="put_like('{{ post.id }}', '{{ csrf_token }}')"><img src="{% static 'network/thumb.png' %}" style="width: 30px; height: 30px;"></button>
+            </div>
+            <div id="like-count{{ post.id }}" class="mx-2">
+              {{ post.liked.count }}
+            </div>
+          </div>
+
+        </div>
+
+          <hr>
+          <div>
+            <h6>Posted: {{ post.date_created|date:"M d, Y, H:i" }}</h6>
+          </div>
+
+          <div id="edited{{ post.id }}">
+            {% if post.date_created|date:"dmYGi" != post.last_edit|date:"dmYGi" %}
+              <h6><i>Edited: {{ post.last_edit|date:"M d, Y, H:i" }}</i></h6>
+            {% endif %}
+          </div>
+
+
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="border border-dark rounded alone text-center m-1 p-1">
+      <div class="text-center pt-2">
+        <h2 class="text-light">Nobody</h2>
+        <div>
+          <img src="{% static 'network/nofollow.png' %}" style="width: 232px; height: 186px;">
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+
+</div>
+
+
+<div class="container">
+    <hr>
+  <div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if posts.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">&laquo; Previous</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link" href="#">Beginning</a></li>
+        {% endif %}
+        <li class="page-item disabled"><a class="page-link" href="#">Page: {{ posts.number }} of {{ posts.paginator.num_pages }}</a></li>
+        {% if posts.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">Next &raquo;</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link" href="#">End</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endblock %}

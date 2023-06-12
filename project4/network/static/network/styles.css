@@ -1,0 +1,313 @@
+textarea {
+  resize: none;
+  background: white;
+  border: black 1px solid;
+  padding: 0px 10px;
+  border-radius: 5px;
+  color: black;
+  text-align: justify;
+  white-space: normal;
+  /*word-break: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;*/
+}
+
+textarea.ta-bio {
+  height: 7.5em;
+  width: 100%;
+}
+
+@media screen and (min-width: 1000px) {
+  textarea.ta-posts {
+    height: 6em;
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 600px) and (max-width: 999px) {
+  textarea.ta-posts {
+    height: 8em;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  textarea.ta-posts {
+    height: 10em;
+    width: 100%;
+  }
+}
+
+
+
+input[type=text] {
+  width: 100%;
+}
+
+input[type=password] {
+  width: 100%;
+}
+
+input[type=email] {
+  width: 100%;
+}
+
+input[type=button] {
+  width: 200px;
+}
+
+input[type=submit] {
+  width: 200px;
+}
+
+button {
+  background: none;
+  border: none;
+  width: 32px;
+}
+
+input[name=logbtn] {
+  width: 100%;
+  background: #a68fbc;
+  color: white;
+  border: solid 1px #2f4f4f;
+  border-radius: 5px;
+}
+
+input:hover[name=logbtn] {
+  width: 100%;
+  background: #8d70a9;
+  color: white;
+}
+
+input:active[name=logbtn] {
+  width: 100%;
+  background: #74568f;
+  color: white;
+  font-weight: bold;
+}
+
+
+input[name=postbtn] {
+  width: 200px;
+  background: #4dacff;
+  color: white;
+  border: solid 1px #005299;
+  border-radius: 5px;
+}
+
+input:hover[name=postbtn] {
+  width: 200px;
+  background: #1a94ff;
+  color: white;
+}
+
+input:active[name=postbtn] {
+  width: 200px;
+  background: #007ae6;
+  color: white;
+  font-weight: bold;
+}
+
+
+input[name=postcmt] {
+  width: 200px;
+  background: #4dacff;
+  color: white;
+  border: solid 1px #005299;
+  border-radius: 5px;
+}
+
+input:hover[name=postcmt] {
+  width: 200px;
+  background: #1a94ff;
+  color: white;
+}
+
+input:active[name=postcmt] {
+  width: 200px;
+  background: #007ae6;
+  color: white;
+  font-weight: bold;
+}
+
+
+span.username {
+  font-family: Garamond, serif;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 1.7em;
+}
+
+a:link[name=username] {
+  text-decoration: none;
+  color: #1a1aff;
+}
+
+a:visited[name=username] {
+  text-decoration: none;
+  color: #1a1aff;
+}
+
+a:hover[name=username] {
+  text-decoration: underline;
+  color: #8600b3;
+}
+
+.ablue {
+  background: AliceBlue;
+}
+
+.ablue:hover {
+  background: #cce7ff;
+}
+
+.lsblue {
+  background: LightSteelBlue;
+  margin-top: 5px;
+}
+
+.lsblue:hover {
+  background: #93aed2;
+}
+
+.lsblue:active {
+  background: #6f93c3
+}
+
+.lorange {
+  background: #fcbcb5;
+  margin-top: 5px;
+}
+
+.lorange:hover {
+  background: #fa8072;
+}
+
+.lorange:active {
+  background: #f84d3a;
+}
+
+.fpink {
+  background: #ffccd4;
+}
+
+.fpink:hover {
+  background: #ffb6c1;
+}
+
+.frose {
+  background: #ffe4e1;
+}
+
+.frose:hover {
+  background: #ffd1cc;
+}
+
+.cblue {
+  background:  #ccffff;
+}
+
+.cblue:hover {
+  background: #99ffff;
+}
+
+.logform {
+  background: #afcfcf;
+}
+
+.logform:hover {
+  background: #8fbcbc;
+}
+
+.proform {
+  background: #fffce6;
+}
+
+.profbtn {
+  width: 200px;
+  margin: 8px 5px 10px 5px;
+  background: #b0e0e6;
+  color: #256b74;
+  border: solid 1px #2b7d88;
+  border-radius: 5px;
+}
+
+.profbtn:hover {
+  background: #8bd1da;
+}
+
+.profbtn:active {
+  background: #64c2ce;
+  font-weight: bold;
+}
+
+.prohead {
+  background: #ffec80;
+}
+
+.prohead:hover {
+  background: #ffe44d;
+}
+
+.propost {
+  background: #fff7cc;
+}
+
+.propost:hover {
+  background: #fff4b3;
+}
+
+.alone {
+  background-image: linear-gradient(#000080, #6495ED, #FFEBCD);
+}
+
+/* Modal window classes */
+.modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 60%;
+  padding: 15px;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background-color: #ffffb3;
+  border: 2px solid #FF8C00;
+  border-radius: 15px;
+}
+
+.modal .flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal p {
+  font-size: 0.9rem;
+  color: black;
+  margin: 10px;
+}
+
+@media screen and (min-width: 1000px) {
+  .modal {
+    height: 340px;
+  }
+}
+
+@media screen and (min-width: 600px) and (max-width: 999px) {
+  .modal {
+    height: 460px;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .modal {
+    height: 550px;
+  }
+}
+
+.hide {
+  display: none;
+}

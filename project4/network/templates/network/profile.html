@@ -1,0 +1,307 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block head %}
+<script>
+  document.addEventListener("DOMContentLoaded",
+    function ()
+    {
+      const current_user = {{ request.user.id }};
+      const profile_member = {{ profile.member.id }};
+
+      if ( current_user !== profile_member )
+      {
+        // console.log("Different user to profile member");
+        document.querySelector("#follow-btn").style.display = "block";
+        get_followers();
+        get_followed_count();
+      }
+      else
+      {
+          document.querySelector("#change-password").style.display = "block";
+          document.querySelector("#edit-profile").style.display = "block";
+          get_followed_count();
+      };
+    }
+  );
+
+  async function get_followers()
+  {
+    const getUrl = "getfollow/" + {{ profile.member.id }};
+    const cGetController = new AbortController();
+    const fGetTimeout = setTimeout(
+      function ()
+      {
+        cGetController.abort();
+      },
+      7000
+    );
+    try
+    {
+        const responseGet = await fetch(getUrl,
+          {
+            method: "GET",
+            signal: cGetController.signal
+          }
+        );
+        if (responseGet.ok)
+        {
+          const dataGet = await responseGet.json();
+          if (await dataGet.followers.find( (m) => m.member_id === parseInt({{ request.user.id }})))
+          {
+            document.querySelector("#follow-btn").value = "Unfollow";
+          }
+          else
+          {
+            document.querySelector("#follow-btn").value = "Follow";
+          };
+        }
+        else
+        {
+          console.log(`Fetch Error: ${responseGet.status}`);
+        };
+    }
+    catch (error)
+    {
+      console.log(`Network Error: ${error.name}`);
+    }
+    finally
+    {
+      clearTimeout(fGetTimeout);
+    };
+  };
+
+  async function set_follow(csrf_token)
+  {
+    const urlPut = "putfollow/" + {{ profile.member.id }};
+    const cPutController = new AbortController();
+    const fPutTimeout = setTimeout(
+      function ()
+      {
+        cPutController.abort();
+      },
+      7000
+    );
+
+    try
+    {
+      const responsePut = await fetch(urlPut,
+        {
+          method: "PUT",
+          headers: {
+            "X-CSRFToken": csrf_token
+          },
+          signal: cPutController.signal
+        }
+      );
+      if (responsePut.ok)
+      {
+        // If everything was okay, get the followers to update the follow button.
+        get_followers();
+        get_followed_count();
+      }
+      else
+      {
+        console.log(`Response Error: ${responsePut.status}`);
+      };
+    }
+    catch (error)
+    {
+      console.log(`Network Error: ${error.name}`);
+    }
+    finally
+    {
+      clearTimeout(fPutTimeout);
+    };
+  };
+
+
+  async function get_followed_count()
+  {
+    const output_str = "";
+    const urlFollow = "updatefollowed/" + {{ profile.member.id }};
+    console.log(urlFollow);
+    const cFollowController = new AbortController();
+    const fFollowTimeout = setTimeout(
+      function ()
+      {
+          cFollowController.abort();
+      },
+      7000
+    );
+    try
+    {
+      const responseFollow = await fetch(urlFollow,
+        {
+          method: "GET",
+          signal: cFollowController.signal
+        }
+      );
+      if (responseFollow.ok)
+      {
+        const dataFollowedCount = await responseFollow.json();
+        // console.log(typeof dataFollowedCount.followed_count);
+        if (dataFollowedCount.followed_count === 1)
+        {
+          document.querySelector("#follow-count").innerText = `1 member follows ${dataFollowedCount.user_name}`;
+        }
+        else
+        {
+          document.querySelector("#follow-count").innerText = `${dataFollowedCount.followed_count} members follow ${dataFollowedCount.user_name}`;
+        };
+
+      }
+      else
+      {
+        console.log(`Response Error: ${responseFollow.status}`);
+      };
+    }
+    catch (error)
+    {
+      console.log(`Network Error ${error.name}`);
+    }
+    finally
+    {
+      clearTimeout(fFollowTimeout);
+    };
+
+  };
+</script>
+<script src="{% static 'network/jscript.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+  Profile
+{% endblock %}
+
+{% block body %}
+
+  <div class="container proform border border-warning rounded my-1">
+    <h1 class="my-2 mx-1">Profile</h1>
+    <div class="row m-1 p-1">
+      <div class="d-flex align-items-start">
+        {% if profile.userimage %}
+          <img src="{{ profile.userimage.url }}" class="border border-dark rounded" style="width: 45px; height: 45px; margin-right: 5px;">
+        {% else %}
+          <img src="{% static 'network/anon.png' %}" class="border border-dark rounded" style="width: 45px; height: 45px; margin-right: 5px;">
+        {% endif %}
+        <span class="username">{{ profile.member.username }}</span>
+      </div>
+    </div>
+    <hr>
+    <div class="row m-1">
+      <div class="d-flex flex-wrap justify-content-around">
+        <div class="col p-2 m-1 border border-warning rounded" style="min-width: 300px;">
+          <h5>Member Data</h5>
+          User Name: {{ member.username }}<br>
+          Full Name: {{ member.first_name }} {{ member.last_name }}<br>
+          Join Date: {{ profile.created|date:"M d, Y, H:i a" }}<br>
+          {% if follows > 1 or follows == 0 %}
+            {{ member.username }} follows {{ follows }} members<br>
+          {% else %}
+            {{ member.username }} follows {{ follows }} member<br>
+          {% endif %}
+
+          <span id="follow-count"></span>
+
+        </div>
+        <div class="col p-2 m-1 border border-warning rounded" style="min-width: 300px;">
+          <h5>Biography</h5>
+          <textarea disabled class="proform ta-bio" style="border: none;">{{ profile.biography }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="row m-1">
+      <div class="d-flex flex-wrap justify-content-center">
+        <input type="button" id="follow-btn" class="profbtn" style="display: none;" onclick="set_follow('{{ csrf_token }}')">
+        <a href="{% url 'changepassword' %}" id="change-password" style="display: none;">
+          <button class="profbtn">Change Password</button>
+        </a>
+        <a href="{% url 'editprofile' %}" id="edit-profile" style="display: none;">
+          <button class="profbtn">Edit Profile</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+    <div class="container border border-dark rounded prohead text-center">
+      <div class="text-center pt-2">
+        <h3>{{ profile.member.username }}'s posts</h3>
+      </div>
+    </div>
+
+
+  {% for post in user_posts %}
+    <div class="container propost border border-dark rounded my-1 py-2">
+      <h4>{{ post.subject }}</h4>
+      {% if request.user == profile.member %}
+        <span><i>Your post ref#: {{ post.id}}</i></span>
+      {% endif %}
+      <textarea class="ta-posts" id="text{{ post.id }}" disabled>{{ post.content }}</textarea>
+
+      <div class="d-flex justify-content-between">
+
+        <div class="d-flex justify-content-start align-items-center">
+          <div>
+            <button onclick="put_like('{{ post.id }}', '{{ csrf_token }}')"><img src="{% static 'network/thumb.png' %}" style="width: 30px; height: 30px;"></button>
+          </div>
+          <div id="like-count{{ post.id }}" class="mx-2">
+            {{ post.liked.count }}
+          </div>
+        </div>
+        {% if user == post.author %}
+          <input type="button" id="edit-btn{{ post.id }}" onclick="do_edit('{{ post.id }}')" class="lsblue" value="Edit">
+          <input hidden type="button" id="save-btn{{ post.id }}" onclick="put_edit('{{ post.id }}', '{{ user.id }}', '{{ csrf_token }}')" class="lorange" value="Save edit">
+        {% endif %}
+      </div>
+
+      <hr>
+      <div>
+        <h6>Posted: {{ post.date_created|date:"M d, Y, H:i" }}</h6>
+      </div>
+      <div id="edited{{ post.id }}">
+        {% if post.date_created|date:"dmYGi" != post.last_edit|date:"dmYGi" %}
+          <h6><i>Edited: {{ post.last_edit|date:"M d, Y, H:i" }}</i></h6>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="container border border-dark rounded alone text-center my-1">
+      <div class="text-center pt-2">
+        <h2 class="text-light">No Posts</h2>
+        <div>
+          <img src="{% static 'network/posts.png' %}" style="width: 200px; height: 239px;">
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+
+
+  <div class="container">
+      <hr>
+    <div class="d-flex justify-content-center">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          {% if user_posts.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ user_posts.previous_page_number }}">&laquo; Previous</a></li>
+          {% else %}
+            <li class="page-item disabled"><a class="page-link" href="#">Beginning</a></li>
+          {% endif %}
+          <li class="page-item disabled"><a class="page-link" href="#">Page: {{ user_posts.number }} of {{ user_posts.paginator.num_pages }}</a></li>
+          {% if user_posts.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ user_posts.next_page_number }}">Next &raquo;</a></li>
+          {% else %}
+            <li class="page-item disabled"><a class="page-link" href="#">End</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+
+
+
+{% endblock %}
